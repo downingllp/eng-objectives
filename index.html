@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quarterly Objectives Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #ffffff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Section */
+        .header {
+            background: linear-gradient(135deg, #1a365d 0%, #2d5a87 100%);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100"><path d="M0,30 C300,80 700,20 1000,60 L1000,0 L0,0 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: cover;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header h1 {
+            font-size: 48px;
+            font-weight: 300;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+        
+        .header p {
+            font-size: 20px;
+            opacity: 0.9;
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 80px 0;
+        }
+        
+        /* Instructions Section */
+        .instructions {
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 8px;
+            margin-bottom: 60px;
+            border-left: 4px solid #1a365d;
+        }
+        
+        .instructions h3 {
+            color: #1a365d;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .instructions ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .instructions li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            color: #555;
+        }
+        
+        .instructions li:before {
+            content: "•";
+            color: #1a365d;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        /* Quarters Grid */
+        .quarters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .quarter-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+        
+        .quarter-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        
+        .quarter-card.current {
+            border-left: 4px solid #28a745;
+        }
+        
+        .quarter-card.current .quarter-header {
+            background: #28a745;
+        }
+        
+        .quarter-card.planned {
+            opacity: 0.85;
+        }
+        
+        .quarter-card.planned .quarter-header {
+            background: #6c757d;
+        }
+        
+        .quarter-header {
+            background: #1a365d;
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .quarter-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .quarter-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .quarter-period {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .quarter-content {
+            padding: 40px;
+        }
+        
+        .quarter-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat {
+            text-align: center;
+            padding: 20px 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a365d;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        
+        .priority-breakdown {
+            margin-bottom: 30px;
+        }
+        
+        .priority-breakdown h4 {
+            color: #1a365d;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .priority-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .priority-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .priority-item:last-child {
+            border-bottom: none;
+        }
+        
+        .priority-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+        
+        .priority-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .priority-high { background: #dc3545; }
+        .priority-medium { background: #fd7e14; }
+        .priority-low { background: #6c757d; }
+        
+        .priority-count {
+            font-weight: 700;
+            color: #1a365d;
+            font-size: 16px;
+        }
+        
+        .quarter-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary {
+            background: #1a365d;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2d5a87;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #6c757d;
+            border: 2px solid #e9ecef;
+        }
+        
+        .btn-secondary:hover {
+            background: #f8f9fa;
+            border-color: #1a365d;
+            color: #1a365d;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Add Quarter Card */
+        .add-quarter-card {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+        
+        .add-quarter-card:hover {
+            border-color: #1a365d;
+            background: #e9ecef;
+        }
+        
+        .add-content {
+            text-align: center;
+            color: #6c757d;
+        }
+        
+        .add-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #1a365d;
+        }
+        
+        .add-text {
+            font-size: 18px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #1a365d;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-top: 80px;
+        }
+        
+        .footer p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 36px;
+            }
+            
+            .header p {
+                font-size: 18px;
+            }
+            
+            .quarters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quarter-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .quarter-actions {
+                flex-direction: column;
+            }
+            
+            .main-content {
+                padding: 40px 0;
+            }
+            
+            .instructions {
+                padding: 30px;
+            }
+        }
+        
+        /* Professional touches */
+        .company-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+        }
+        
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e9ecef, transparent);
+            margin: 60px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1>Quarterly Objectives Dashboard</h1>
+                <p>Strategic planning and performance tracking across all quarterly periods</p>
+                <div class="company-badge">Internal Management System</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="instructions">
+                <h3>Dashboard Overview</h3>
+                <ul>
+                    <li><strong>View Objectives:</strong> Click "View Objectives" to access the comprehensive priority matrix</li>
+                    <li><strong>Add New Quarters:</strong> Create new HTML files following the naming convention (e.g., 2025-26-q3.html)</li>
+                    <li><strong>Update Progress:</strong> Edit the JavaScript configuration to reflect current status and completion rates</li>
+                    <li><strong>Track Performance:</strong> Monitor objective completion and priority distribution across quarters</li>
+                </ul>
+            </div>
+
+            <div class="quarters-grid" id="quartersGrid">
+                <!-- Quarters will be populated by JavaScript -->
+            </div>
+
+            <div class="section-divider"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+            <p>Last updated: <span id="lastUpdated"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Configure your quarters here
+        const quarters = [
+            {
+                id: '2025-26-q2',
+                title: 'Q2 2025-26',
+                period: 'July - September 2025',
+                status: 'current', // 'current', 'completed', 'planned'
+                fileName: '2025-26-q2.html', // The HTML file name for this quarter
+                stats: {
+                    total: 28, // Total unique objectives (excluding duplicates)
+                    completed: 0,
+                    inProgress: 28
+                },
+                priorities: {
+                    high: 17,
+                    medium: 6,
+                    low: 5
+                }
+            },
+            {
+                id: '2025-26-q3',
+                title: 'Q3 2025-26',
+                period: 'October - December 2025',
+                status: 'planned',
+                fileName: '2025-26-q3.html',
+                stats: {
+                    total: 0,
+                    completed: 0,
+                    inProgress: 0
+                },
+                priorities: {
+                    high: 0,
+                    medium: 0,
+                    low: 0
+                }
+            },
+            {
+                id: '2025-26-q4',
+                title: 'Q4 2025-26',
+                period: 'January - March 2026',
+                status: 'planned',
+                fileName: '2025-26-q4.html',
+                stats: {
+                    total: 0,
+                    completed: 0,
+                    inProgress: 0
+                },
+                priorities: {
+                    high: 0,
+                    medium: 0,
+                    low: 0
+                }
+            },
+            {
+                id: '2026-27-q1',
+                title: 'Q1 2026-27',
+                period: 'April - June 2026',
+                status: 'planned',
+                fileName: '2026-27-q1.html',
+                stats: {
+                    total: 0,
+                    completed: 0,
+                    inProgress: 0
+                },
+                priorities: {
+                    high: 0,
+                    medium: 0,
+                    low: 0
+                }
+            }
+        ];
+
+        function renderQuarters() {
+            const grid = document.getElementById('quartersGrid');
+            grid.innerHTML = '';
+
+            quarters.forEach(quarter => {
+                const card = document.createElement('div');
+                card.className = `quarter-card ${quarter.status}`;
+                
+                const completionRate = quarter.stats.total > 0 ? 
+                    Math.round((quarter.stats.completed / quarter.stats.total) * 100) : 0;
+
+                const statusLabels = {
+                    current: 'Current',
+                    completed: 'Completed',
+                    planned: 'Planned'
+                };
+
+                card.innerHTML = `
+                    <div class="quarter-header">
+                        <div class="quarter-status">${statusLabels[quarter.status]}</div>
+                        <h2 class="quarter-title">${quarter.title}</h2>
+                        <p class="quarter-period">${quarter.period}</p>
+                    </div>
+                    <div class="quarter-content">
+                        <div class="quarter-stats">
+                            <div class="stat">
+                                <div class="stat-number">${quarter.stats.total}</div>
+                                <div class="stat-label">Total Objectives</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">${quarter.stats.completed}</div>
+                                <div class="stat-label">Completed</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">${completionRate}%</div>
+                                <div class="stat-label">Progress</div>
+                            </div>
+                        </div>
+                        
+                        ${quarter.priorities.high > 0 ? `
+                        <div class="priority-breakdown">
+                            <h4>Priority Distribution</h4>
+                            <ul class="priority-list">
+                                <li class="priority-item">
+                                    <div class="priority-label">
+                                        <div class="priority-dot priority-high"></div>
+                                        High Priority
+                                    </div>
+                                    <div class="priority-count">${quarter.priorities.high}</div>
+                                </li>
+                                <li class="priority-item">
+                                    <div class="priority-label">
+                                        <div class="priority-dot priority-medium"></div>
+                                        Medium Priority
+                                    </div>
+                                    <div class="priority-count">${quarter.priorities.medium}</div>
+                                </li>
+                                <li class="priority-item">
+                                    <div class="priority-label">
+                                        <div class="priority-dot priority-low"></div>
+                                        Low Priority
+                                    </div>
+                                    <div class="priority-count">${quarter.priorities.low}</div>
+                                </li>
+                            </ul>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="quarter-actions">
+                            ${quarter.stats.total > 0 ? `
+                                <a href="${quarter.fileName}" class="btn btn-primary">View Objectives</a>
+                            ` : `
+                                <button class="btn btn-secondary" disabled>No Objectives</button>
+                            `}
+                        </div>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+
+            // Add "Add New Quarter" card
+            const addCard = document.createElement('div');
+            addCard.className = 'quarter-card add-quarter-card';
+            addCard.innerHTML = `
+                <div class="add-content">
+                    <div class="add-icon">+</div>
+                    <div class="add-text">Add New Quarter</div>
+                </div>
+            `;
+            addCard.addEventListener('click', () => {
+                alert('To add a new quarter:\\n\\n1. Create a new HTML file (e.g., 2026-27-q2.html)\\n2. Update the quarters array in index.html\\n3. Configure stats and priorities\\n4. Upload to your hosting platform');
+            });
+            grid.appendChild(addCard);
+        }
+
+        function updateLastUpdated() {
+            const now = new Date();
+            const formatted = now.toLocaleDateString('en-GB', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('lastUpdated').textContent = formatted;
+        }
+
+        // Initialize the page
+        renderQuarters();
+        updateLastUpdated();
+    </script>
+</body>
+</html>
